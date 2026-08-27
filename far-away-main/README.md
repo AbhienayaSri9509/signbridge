@@ -293,22 +293,12 @@ git push origin feature-name
 
 ---
 
-# 👨‍💻 Team Apple
-
-### Contributors
-
-* Abhienaya Sri (@AbhienayaSri9509)
-* Afra (@afra245)
-* Sanjay (@Sanjay-2806)
-
----
-
 # 📜 License
 
 This project is licensed under the MIT License.
 
 ---
 
-# ❤️ Made with Love by Team Apple
+# ❤️ Made with Love 
 
 Empowering communication through Artificial Intelligence and Accessibility Technology.
