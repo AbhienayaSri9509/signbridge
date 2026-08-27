@@ -1,0 +1,36 @@
+export interface TextToSignResult {
+  vidRef: string;
+  videoUrl: string;
+  matchedSentence: string;
+}
+
+const API_BASE = (import.meta as any).env.VITE_API_URL || 'http://localhost:8002';
+
+export const runTextToSign = async (userText: string): Promise<TextToSignResult> => {
+  const trimmed = userText.trim();
+  if (!trimmed) {
+    throw new Error('Text is empty.');
+  }
+
+  const response = await fetch(`${API_BASE}/text-to-sign`, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify({ text: trimmed }),
+  });
+
+  if (!response.ok) {
+    const errorText = await response.text().catch(() => '');
+    throw new Error(
+      `Text-to-sign server error (${response.status}): ${errorText || response.statusText}`
+    );
+  }
+
+  const data = await response.json();
+
+  // Return data directly as videoUrl is now external
+  return data;
+};
+
+
