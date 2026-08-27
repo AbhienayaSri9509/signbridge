@@ -13,41 +13,55 @@ export const runTextToSign = async (userText: string): Promise<TextToSignResult>
     throw new Error('Please enter text to search.');
   }
 
-  // 1. Try local server first if available
-  try {
-    const controller = new AbortController();
-    const timeoutId = setTimeout(() => controller.abort(), 2500); // 2.5s timeout for fast fallback
+  // Smart word normalizer for common greetings and phrases
+  let normalizedQuery = trimmed.toLowerCase();
+  if (/^hi+$/i.test(normalizedQuery)) normalizedQuery = 'hello';
+  else if (/^he+l+o+$/i.test(normalizedQuery)) normalizedQuery = 'hello';
+  else if (/^(thx|tysm|thanx)$/i.test(normalizedQuery)) normalizedQuery = 'thank you';
+  else if (/^pls|plz$/i.test(normalizedQuery)) normalizedQuery = 'please';
+  else if (/^gm$/i.test(normalizedQuery)) normalizedQuery = 'good morning';
 
-    const response = await fetch(`${API_BASE}/text-to-sign`, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({ text: trimmed }),
-      signal: controller.signal
-    });
+  const isHttps = typeof window !== 'undefined' && window.location.protocol === 'https:';
+  const isLocalBase = API_BASE.includes('localhost') || API_BASE.includes('127.0.0.1');
 
-    clearTimeout(timeoutId);
+  // 1. Only try local server when running in local HTTP development
+  if (!isHttps || !isLocalBase) {
+    try {
+      const controller = new AbortController();
+      const timeoutId = setTimeout(() => controller.abort(), 2000);
 
-    if (response.ok) {
-      const data = await response.json();
-      return data;
+      const response = await fetch(`${API_BASE}/text-to-sign`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ text: trimmed }),
+        signal: controller.signal
+      });
+
+      clearTimeout(timeoutId);
+
+      if (response.ok) {
+        const data = await response.json();
+        return data;
+      }
+    } catch (e) {
+      // Local server not available, seamlessly continue to web resolution
     }
-  } catch (e) {
-    // Local server is not running (e.g. running on Vercel/cloud)
   }
 
-  // 2. Browser-native ASL resolution
-  const cleanQuery = trimmed.toLowerCase().replace(/[^a-z0-9\s]/g, '').trim().replace(/\s+/g, '-');
+  // 2. Browser-native ASL resolution with SignASL index
+  const cleanQuery = normalizedQuery.replace(/[^a-z0-9\s]/g, '').trim().replace(/\s+/g, '-');
   const videoUrl = `https://www.signasl.org/sign/${cleanQuery}`;
 
   return {
     vidRef: cleanQuery,
     videoUrl: videoUrl,
     matchedSentence: trimmed,
-    isFingerspelling: trimmed.length > 20
+    isFingerspelling: trimmed.length > 15
   };
 };
+
 
 
 
