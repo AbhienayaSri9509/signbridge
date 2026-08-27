@@ -23,7 +23,8 @@ const SignLanguageCamera: React.FC<SignLanguageCameraProps> = ({ onSignDetected,
   const [detectedText, setDetectedText] = useState<string>('');
   const [permissionStatus, setPermissionStatus] = useState<'idle' | 'prompt' | 'granted' | 'denied'>('idle');
   const [isRequestingCamera, setIsRequestingCamera] = useState(false);
-  const [isOfflineMode, setIsOfflineMode] = useState(true);
+  const [isOfflineMode, setIsOfflineMode] = useState(false);
+
 
   // Stop everything (Stream + Capture)
   const stopEverything = useCallback(() => {

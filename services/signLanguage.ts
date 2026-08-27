@@ -6,9 +6,9 @@ type SupportedLanguage = 'en' | 'ta';
 
 const getApiKey = (): string => {
   return (
-    (typeof process !== 'undefined' && (process.env?.API_KEY || process.env?.GEMINI_API_KEY)) ||
-    (typeof import.meta !== 'undefined' && (import.meta as any).env?.VITE_GEMINI_API_KEY) ||
     (typeof window !== 'undefined' && window.localStorage?.getItem('gemini_api_key')) ||
+    (typeof import.meta !== 'undefined' && (import.meta as any).env?.VITE_GEMINI_API_KEY) ||
+    (typeof process !== 'undefined' && (process.env?.API_KEY || process.env?.GEMINI_API_KEY)) ||
     ''
   );
 };
@@ -64,7 +64,7 @@ export const processSignLanguageImage = async (
     }
   }
 
-  // If online didn't return a result, try local YOLO as fallback
+  // If online didn't return a result, try local YOLO as fallback if in local environment
   try {
     const localResult = await processLocalYoloImage(imageBase64);
     if (localResult) return localResult;
@@ -76,14 +76,26 @@ export const processSignLanguageImage = async (
 };
 
 const processLocalYoloImage = async (imageBase64: string): Promise<string> => {
+  const isHttps = typeof window !== 'undefined' && window.location.protocol === 'https:';
+  if (isHttps) {
+    // Cannot query http://localhost:5001 from https deployment without mixed content block
+    throw new Error('Local server only accessible in local HTTP environment');
+  }
+
   try {
+    const controller = new AbortController();
+    const timeoutId = setTimeout(() => controller.abort(), 2000);
+
     const response = await fetch('http://localhost:5001/predict', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
       },
       body: JSON.stringify({ image: imageBase64 }),
+      signal: controller.signal
     });
+
+    clearTimeout(timeoutId);
 
     if (!response.ok) {
       throw new Error(`Local Server Error: ${response.statusText}`);
@@ -95,4 +107,5 @@ const processLocalYoloImage = async (imageBase64: string): Promise<string> => {
     throw error;
   }
 };
+
 
