@@ -57,3 +57,32 @@ git clone https://github.com/YOUR_USERNAME/hacker.git
 cd hacker
 npm install
 npm run dev
+
+Open:
+
+http://localhost:3000
+Environment Setup
+
+Create a .env.local file:
+
+GEMINI_API_KEY=your_api_key_here
+Applications
+
+Sign Bridge AI can support communication in:
+
+Education
+Healthcare
+Workplaces
+Interviews
+Customer Support
+Emergency Services
+Future Enhancements
+Additional language support
+Mobile application
+Offline sign recognition
+Enhanced avatar realism
+Gesture personalization
+Healthcare and education integrations
+License
+
+This project is licensed under the MIT License.
