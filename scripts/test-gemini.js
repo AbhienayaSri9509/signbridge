@@ -6,8 +6,8 @@ import { GoogleGenerativeAI } from '@google/generative-ai';
 async function main() {
   const apiKey = process.env.GEMINI_API_KEY;
   if (!apiKey) {
-    console.log('Gemini test skipped: GEMINI_API_KEY is not configured.');
-    process.exit(0);
+    console.error('GEMINI_API_KEY is not set. Add it to your environment or .env.local/.env.');
+    process.exit(1);
   }
 
   try {
