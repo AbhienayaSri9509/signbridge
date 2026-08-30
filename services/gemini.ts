@@ -5,7 +5,7 @@ export const getStoredApiKey = (): string => {
   return (
     (typeof window !== 'undefined' && window.localStorage?.getItem('gemini_api_key')) ||
     (typeof import.meta !== 'undefined' && (import.meta as any).env?.VITE_GEMINI_API_KEY) ||
-    (typeof process !== 'undefined' && (process.env?.API_KEY || process.env?.GEMINI_API_KEY)) ||
+
     ''
   );
 };
@@ -120,4 +120,4 @@ export const sendMessageToGemini = async (message: string): Promise<string> => {
 
   return getIntelligentCompanionResponse(message);
 };
-
+
